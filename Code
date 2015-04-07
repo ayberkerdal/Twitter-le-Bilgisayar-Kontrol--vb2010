@@ -1,0 +1,54 @@
+Gerekli Materyaller  :
+2 textbox , 1 button , 1 webbrowser , 1 timer ve 1 adet richtextbox  ( eğer geliştirmek isterseniz 1 listbox ekleyip için log penceresi  gibi birşeyler yapabilirsiniz :) )
+2. textboxumuzun içine komutumuz olan Mentalistlerkapat yazıyoruz ( isterseniz textbox kullanmaya bilirsiniz ben komutu kolaylıkça değiştirebilmek için yaptım ) 
+Imports System.Text.RegularExpressions
+
+Public Class Form1
+
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        WebBrowser1.Navigate("www.twitter.com") ' webbrowserımızın twitter adresine gitmesini sağlıyoruz
+        Timer1.Start() ' timer'imizi çalıştırıyoruz
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        WebBrowser1.Navigate(TextBox1.Text) 'twitter adresine gidiceğimiz kişinin linki yazıyoruz
+    End Sub
+
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        
+    End Sub
+
+    Private Sub Timer1_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer1.Tick
+        WebBrowser1.Refresh() ' webbrowser'de sayfayı yeniliyoruz
+        Dim bilgi As HtmlElementCollection = WebBrowser1.Document.All 'dim değeri atıyoruz
+        For Each element As HtmlElement In bilgi ' for each döngüsü başlatıyoruz
+            If element.GetAttribute("classname").Contains("tweet-text") Then ' websitesindeki tweet-text değerine sahip classlardaki yazıları çekiyoruz
+                RichTextBox1.Text = RichTextBox1.Text & element.InnerText ' yazıları richtextbox1'e yansıtıyoruz
+            End If ' if döngümüzü sonlandırıyoruz
+        Next
+
+        Dim a As String = ".*" & TextBox2.Text & ".*" ' dim değerimizi atıyoruz
+        Dim b As Match = Regex.Match(RichTextBox1.Text, a, RegexOptions.IgnoreCase) ' dim değerimizi atıyoruz
+        If b.Success Then 'eğer textbox2 ye yazdığımız richtextbox1 de var ise aşağıdaki komutları uyguluyoruz
+
+            RichTextBox1.SelectionStart = 0  ' yazıyı seçmek için başlangıç 0
+            RichTextBox1.SelectionLength = 0 ' uzunluk 0 
+            RichTextBox1.SelectionStart = b.Index ' textbox2 başlangıç yapıyoruz
+            RichTextBox1.SelectionLength = TextBox2.Text.Length ' uzunluğunuda textbox2'nin içinde aranan harf kadar ayarlıyoruz
+            RichTextBox1.SelectionBackColor = Color.Crimson ' seçilen yeri renklendiriyoruz
+            Shell("shutdown -f -s") ' ve komutumuz olan bilgisayarı kapat komutu
+        End If
+
+
+  end sub
+
+    Private Sub Button2_Click_2(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        MsgBox(" Bilgisayarı Kapatmak için : MentalistlerKapat Bilgisayarı ") ' butona basıldıktan sonra msgbox kutusu çıkartıyoruz
+    End Sub
+End Class
+--------------------------------------------------------------------
+
+kullanımı : 
+komutları alıcağımız twitter adresine gireriz ve textbox1'den profiline gireriz
+ardından başka bir bilgisayardan , telefondan vb. yerlerden komutumuzu gireriz örn : Mentalistlerkapat
+program timerin valuesine göre kendini yenileypi komutu algıladığında bilgisayar kendini kapatır.
